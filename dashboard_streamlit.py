@@ -1,7 +1,8 @@
 """
-python -m streamlit run dashboard_streamlit.py --server.headless true
+python -m streamlit run dashboard_streamlit.py --server.headless true -- --csv_path path --place home
 http://raspX.local:8501
 """
+import argparse
 import datetime
 import pandas as pd
 import streamlit as st
@@ -9,37 +10,50 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 
-### Read csv datas ###
-csv_path = "data_office.csv"
-df = pd.read_csv(csv_path, header=0, index_col=0)
+parser = argparse.ArgumentParser()
+parser.add_argument("--csv_path", default="./datas/data.csv",
+                    help="Path to csv file")
+parser.add_argument("--place", default="office", choices=["office", "home"],
+                    help="place to use (determine sensors)")
+args = parser.parse_args()
+csv_path = args.csv_path
+place = args.place
 
-# label - ylabel
-ylabel_dict = {
-    "Temperature (SHT31)" : "Temperature [℃]",
-    "Humidity (SHT31)" : "Humidity [%RH]",
-    # "Temperature (ADT7410)" : "Temperature [℃]",
-    "CO2 (MH-z19)": "CO2 [ppm]",
-    "Temperature (MH-z19)" : "Temperature [℃]"
-    }
+
+### Read csv datas ###
+df = pd.read_csv(csv_path, header=0, index_col=0)
 
 # label - column of df
 column_dict = {
-    "Temperature (SHT31)" : "sht31_temperature",
-    "Humidity (SHT31)" : "sht31_humidity",
-    # "Temperature (ADT7410)" : "adt7410_temperature",
     "CO2 (MH-z19)": "mhz19_co2",
     "Temperature (MH-z19)": "mhz19_temperature"
 }
 
+# label - ylabel
+ylabel_dict = {
+    "CO2 (MH-z19)": "CO2 [ppm]",
+    "Temperature (MH-z19)" : "Temperature [℃]"
+    }
+
 # label - type
 type_dict = {
-    "Temperature (SHT31)" : "Temperature",
-    "Humidity (SHT31)" : "Humidity",
-    # "Temperature (ADT7410)" : "Temperature",
     "CO2 (MH-z19)": "CO2",
-    # "Temperature (MH-z19)" : "Temperature",
 }
-type_set = set(type_dict.values())
+
+if place == "home":
+    ylabel_dict["Temperature (ADT7410)"] = "Temperature [℃]"
+    column_dict["Temperature (ADT7410)"] = "adt7410_temperature"
+    type_dict["Temperature (ADT7410)"] = "Temperature"
+    type_dict["Temperature (MH-z19)"] = "Temperature"
+elif place == "office":
+    ylabel_dict["Temperature (SHT31)"] = "Temperature [℃]"
+    column_dict["Temperature (SHT31)"] = "sht31_temperature"
+    type_dict["Temperature (SHT31)"] = "Temperature"
+    ylabel_dict["Humidity (SHT31)"] = "Humidity [%RH]"
+    column_dict["Humidity (SHT31)"] = "sht31_humidity"
+    type_dict["Humidity (SHT31)"] = "Humidity"
+else:
+    raise NotImplementedError(place)
 
 
 ### Sidebar ###
@@ -51,6 +65,7 @@ st.sidebar.write("# 設定")
 #     "可視化するデータを選択:",
 #     column_dict.keys(),
 #     default=column_dict.keys())
+type_set = set(type_dict.values())
 selected_types = st.sidebar.multiselect(
     "可視化するデータ",
     type_set,
