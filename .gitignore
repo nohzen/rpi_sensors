@@ -1,1 +1,6 @@
+# datas
 *.csv
+
+# python
+__pycache__/
+*.py[cod]
