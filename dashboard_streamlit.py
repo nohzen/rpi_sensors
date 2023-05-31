@@ -64,11 +64,11 @@ def main(args):
         "可視化するデータ",
         type_set,
         default=type_set)
-    time_range_list = ["year", "month", "weak", "day", "hour"]
+    time_range_list = ["year", "month", "week", "day", "hour"]
     time_range = st.sidebar.selectbox(
         "日時範囲",
         time_range_list,
-        index=1
+        index=3
     )
     graph_list = ["pyplot", "streamlit"]
     graph = st.sidebar.selectbox(
@@ -108,7 +108,7 @@ def main(args):
         elif time_range == "month":
             past = now - datetime.timedelta(weeks=5.0)
             rule = datetime.timedelta(days=0.1)
-        elif time_range == "weak":
+        elif time_range == "week":
             past = now - datetime.timedelta(weeks=1.1)
             rule = datetime.timedelta(weeks=0.01)
         elif time_range == "day":
