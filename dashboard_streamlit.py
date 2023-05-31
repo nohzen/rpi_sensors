@@ -120,7 +120,7 @@ def main(args):
             formatter = mdates.DateFormatter("%H:%M")
         elif time_range == "hour":
             past = now - datetime.timedelta(hours=1.1)
-            rule = datetime.timedelta(hours=0.01)
+            rule = datetime.timedelta(minutes=1)
             formatter = mdates.DateFormatter("%H:%M")
         else:
             raise NotImplementedError()
