@@ -105,18 +105,23 @@ def main(args):
         if time_range == "year":
             past = now - datetime.timedelta(days=365)
             rule = datetime.timedelta(days=1)
+            formatter = mdates.DateFormatter("%m/%d")
         elif time_range == "month":
             past = now - datetime.timedelta(weeks=5.0)
             rule = datetime.timedelta(days=0.1)
+            formatter = mdates.DateFormatter("%m/%d")
         elif time_range == "week":
             past = now - datetime.timedelta(weeks=1.1)
             rule = datetime.timedelta(weeks=0.01)
+            formatter = mdates.DateFormatter("%m/%d (%a.)")
         elif time_range == "day":
             past = now - datetime.timedelta(days=1.1)
             rule = datetime.timedelta(days=0.01)
+            formatter = mdates.DateFormatter("%H:%M")
         elif time_range == "hour":
             past = now - datetime.timedelta(hours=1.1)
             rule = datetime.timedelta(hours=0.01)
+            formatter = mdates.DateFormatter("%H:%M")
         else:
             raise NotImplementedError()
         select_data = select_data[past: now]
@@ -128,7 +133,6 @@ def main(args):
         elif graph == "pyplot":
             fig, ax = plt.subplots()
             ax.plot(date_time, select_data, marker=".", label=selected_labels)
-            # ax.plot(date_time, select_data, label=selected_labels)
 
             ax.set_title(selected_type)
             ax.set_xlabel("date time")
@@ -136,8 +140,8 @@ def main(args):
             ax.grid()
 
             plt.legend()
-            plt.xticks(rotation=30)
-            plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%m/%d(%a.) %H:%M"))
+            plt.xticks(rotation=60)
+            plt.gca().xaxis.set_major_formatter(formatter)
 
             plt.tight_layout()
 
