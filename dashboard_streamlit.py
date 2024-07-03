@@ -64,7 +64,7 @@ def main(args):
         "可視化するデータ",
         type_set,
         default=type_set)
-    time_range_list = ["year", "month", "week", "day", "hour"]
+    time_range_list = ["decade", "year", "month", "week", "day", "hour"]
     time_range = st.sidebar.selectbox(
         "日時範囲",
         time_range_list,
@@ -102,8 +102,12 @@ def main(args):
 
         ## time range
         now = datetime.datetime.now()
-        if time_range == "year":
-            past = now - datetime.timedelta(days=365)
+        if time_range == "decade":
+            past = now - datetime.timedelta(days=365*11)
+            rule = datetime.timedelta(days=10)
+            formatter = mdates.DateFormatter("%Y/%m")
+        elif time_range == "year":
+            past = now - datetime.timedelta(days=400)
             rule = datetime.timedelta(days=1)
             formatter = mdates.DateFormatter("%m/%d")
         elif time_range == "month":
