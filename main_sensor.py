@@ -68,4 +68,4 @@ if __name__ == '__main__':
 
     while True:
         read_sensor(csv_path, place)
-        time.sleep(60.0)
+        time.sleep(300.0)
