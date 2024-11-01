@@ -99,6 +99,7 @@ def main(args):
 
         columns = [column_dict[label] for label in selected_labels]
         select_data = df[columns]
+        select_data = select_data.sort_index()
 
         ## time range
         now = datetime.datetime.now()
