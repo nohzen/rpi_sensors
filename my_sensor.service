@@ -1,0 +1,12 @@
+[Unit]
+Description=Start rpi sensors
+After=network.target
+
+[Service]
+User=nohzen
+WorkingDirectory=/home/nohzen/Documents/git/rpi_sensors
+ExecStart=/usr/bin/python3 main_sensor.py --db_path datas/data_home.db --place home
+
+[Install]
+WantedBy=multi-user.target
+
