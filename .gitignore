@@ -1,5 +1,6 @@
 # datas
 *.csv
+*.db
 
 # python
 __pycache__/

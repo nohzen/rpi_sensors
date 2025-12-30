@@ -8,14 +8,25 @@ import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import sqlite3
 
 
 def main(args):
     csv_path = args.csv_path
+    db_path = args.db_path
     place = args.place
 
     ### Read csv datas ###
-    df = pd.read_csv(csv_path, header=0, index_col=0)
+    if False:
+        # Use csv
+        df = pd.read_csv(csv_path, header=0, index_col=0)
+        # print(df.head())
+    else:
+        # Use sqlite db
+        # TODO: Only read needed datas
+        conn = sqlite3.connect(db_path)
+        df = pd.read_sql("SELECT * FROM sensor_data", conn, index_col="datetime")
+        conn.close()
 
     # label - column of df
     column_dict = {
@@ -179,14 +190,16 @@ def main(args):
     st.write("# 生データ ダウンロード")
     now = datetime.datetime.now()
     save_csv_path = "raw_data_{0:%Y%m%d}.csv".format(now)
-    with open(csv_path) as file:
-        st.download_button(label="Download as csv", data=file, file_name=save_csv_path)
+    csv_bytes = df.to_csv().encode("utf-8")
+    st.download_button(label="Download as csv", data=csv_bytes, file_name=save_csv_path)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--csv_path", default="./datas/data.csv",
                         help="Path to csv file")
+    parser.add_argument("--db_path", default="./datas/data.db",
+                        help="Path to sqlite db file")
     parser.add_argument("--place", default="office", choices=["office", "home"],
                         help="place to use (determine sensors)")
     parser.add_argument("--use_profile", action="store_true", help="Get line profilering")
