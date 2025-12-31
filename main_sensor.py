@@ -4,10 +4,12 @@ import csv
 from co2_mh_z19 import Co2SensorMhZ19
 from thermometer_adt7410 import adt7410_read
 from thermometer_sht31 import HumidityTemperatureSensorSht31
+import switchbot
 
 
 sht31_sensor = HumidityTemperatureSensorSht31()
 co2_sensor = Co2SensorMhZ19(serial_device="/dev/ttyS0", abc=False)
+switchbot_sensor = switchbot.SwitchBot()
 
 
 def write_header(csv_path, place):
@@ -37,11 +39,22 @@ def read_sensor(sensor_db, place):
     if place == "home":
         adt7410_temperature = adt7410_read()
         mhz19_co2, mhz19_temperature = co2_sensor.readall()
+        switchbot_sensor.update_header()
+        switchbot_meter_temperature, switchbot_meter_humidity = switchbot_sensor.get_meter()
+        switchbot_hub3_temperature, switchbot_hub3_humidity = switchbot_sensor.get_hub3()
+        switchbot_outdoor_meter_temperature, switchbot_outdoor_meter_humidity = switchbot_sensor.get_outdoor_meter()
+
         data_dict = {
             'datetime': now,
             'adt7410_temperature': adt7410_temperature,
             'mhz19_co2': mhz19_co2,
-            'mhz19_temperature': mhz19_temperature
+            'mhz19_temperature': mhz19_temperature,
+            'switchbot_meter_temperature': switchbot_meter_temperature,
+            'switchbot_meter_humidity': switchbot_meter_humidity,
+            'switchbot_hub3_temperature': switchbot_hub3_temperature,
+            'switchbot_hub3_humidity': switchbot_hub3_humidity,
+            'switchbot_outdoor_meter_temperature': switchbot_outdoor_meter_temperature,
+            'switchbot_outdoor_meter_humidity': switchbot_outdoor_meter_humidity,
         }
         sensor_db.add_data(data_dict)
     elif place == "office":

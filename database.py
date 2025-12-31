@@ -40,12 +40,13 @@ class SensorDataDB:
         # cid, name, type, notnull(nullを許すか), dflt_value(default value), pk(primary key)
         for row in self.cursor.fetchall():
             print(row)
+            name = row[1]
+            self.cursor.execute(f"SELECT COUNT({name}) FROM sensor_data")
+            print(f"    count: ", self.cursor.fetchone()[0])
 
         # Data count
         self.cursor.execute("SELECT COUNT(*) FROM sensor_data")
-        print("Data count:", self.cursor.fetchone()[0])
-        self.cursor.execute("SELECT COUNT(switchbot_hub3_humidity) FROM sensor_data")
-        print("Data count:", self.cursor.fetchone())
+        print("Total count:", self.cursor.fetchone()[0])
 
         # select_sql = 'SELECT * FROM sensor_data'
         # for row in self.cursor.execute(select_sql):
@@ -72,26 +73,26 @@ if __name__ == '__main__':
     db_path = './datas/data_home.db'
 
     db = SensorDataDB(db_path)
-
-    # db.add_column('switchbot_meter_temperature', 'REAL')
-    # db.add_column('switchbot_meter_humidity', 'REAL')
-    # db.add_column('switchbot_outdoor_meter_temperature', 'REAL')
-    # db.add_column('switchbot_outdoor_meter_humidity', 'REAL')
-    # db.add_column('switchbot_hub3_temperature', 'REAL')
-    # db.add_column('switchbot_hub3_humidity', 'REAL')
-
+    db.show_db_info()
     # db.convert_csv_to_db(csv_path)
+
+    ### Add columns for SwitchBot sensors
+    db.add_column('switchbot_meter_temperature', 'REAL')
+    db.add_column('switchbot_meter_humidity', 'REAL')
+    db.add_column('switchbot_outdoor_meter_temperature', 'REAL')
+    db.add_column('switchbot_outdoor_meter_humidity', 'REAL')
+    db.add_column('switchbot_hub3_temperature', 'REAL')
+    db.add_column('switchbot_hub3_humidity', 'REAL')
     db.show_db_info()
 
 
-    data_dict = {
-        'datetime': '2024-06-01 12:00:00',
-        'switchbot_meter_temperature': 23.5,
-        'switchbot_meter_humidity': 45.2,
-        'switchbot_hub3_temperature': 18.3,
-        'switchbot_hub3_humidity': 55.1
-    }
-    db.add_data(data_dict)
-
-    db.show_db_info()
+    # data_dict = {
+    #     'datetime': '2024-06-01 12:00:00',
+    #     'switchbot_meter_temperature': 23.5,
+    #     'switchbot_meter_humidity': 45.2,
+    #     'switchbot_hub3_temperature': 18.3,
+    #     'switchbot_hub3_humidity': 55.1
+    # }
+    # db.add_data(data_dict)
+    # db.show_db_info()
 
