@@ -46,16 +46,35 @@ def main(args):
     }
 
     if place == "home":
-        ylabel_dict["Temperature (ADT7410)"] = "Temperature [℃]"
-        column_dict["Temperature (ADT7410)"] = "adt7410_temperature"
-        type_dict["Temperature (ADT7410)"] = "Temperature"
         type_dict["Temperature (MH-z19)"] = "Temperature"
+        column_dict["Temperature (ADT7410)"] = "adt7410_temperature"
+        ylabel_dict["Temperature (ADT7410)"] = "Temperature [℃]"
+        type_dict["Temperature (ADT7410)"] = "Temperature"
+
+        column_dict["Temperature (SwitchBot Meter)"] = "switchbot_meter_temperature"
+        ylabel_dict["Temperature (SwitchBot Meter)"] = "Temperature [℃]"
+        type_dict["Temperature (SwitchBot Meter)"] = "Temperature"
+        column_dict["Humidity (SwitchBot Meter)"] = "switchbot_meter_humidity"
+        ylabel_dict["Humidity (SwitchBot Meter)"] = "Humidity [%RH]"
+        type_dict["Humidity (SwitchBot Meter)"] = "Humidity"
+        column_dict["Temperature (SwitchBot Hub3)"] = "switchbot_hub3_temperature"
+        ylabel_dict["Temperature (SwitchBot Hub3)"] = "Temperature [℃]"
+        type_dict["Temperature (SwitchBot Hub3)"] = "Temperature"
+        column_dict["Humidity (SwitchBot Hub3)"] = "switchbot_hub3_humidity"
+        ylabel_dict["Humidity (SwitchBot Hub3)"] = "Humidity [%RH]"
+        type_dict["Humidity (SwitchBot Hub3)"] = "Humidity"
+        column_dict["Temperature (SwitchBot Outdoor Meter)"] = "switchbot_outdoor_meter_temperature"
+        ylabel_dict["Temperature (SwitchBot Outdoor Meter)"] = "Temperature [℃]"
+        type_dict["Temperature (SwitchBot Outdoor Meter)"] = "Temperature"
+        column_dict["Humidity (SwitchBot Outdoor Meter)"] = "switchbot_outdoor_meter_humidity"
+        ylabel_dict["Humidity (SwitchBot Outdoor Meter)"] = "Humidity [%RH]"
+        type_dict["Humidity (SwitchBot Outdoor Meter)"] = "Humidity"
     elif place == "office":
-        ylabel_dict["Temperature (SHT31)"] = "Temperature [℃]"
         column_dict["Temperature (SHT31)"] = "sht31_temperature"
+        ylabel_dict["Temperature (SHT31)"] = "Temperature [℃]"
         type_dict["Temperature (SHT31)"] = "Temperature"
-        ylabel_dict["Humidity (SHT31)"] = "Humidity [%RH]"
         column_dict["Humidity (SHT31)"] = "sht31_humidity"
+        ylabel_dict["Humidity (SHT31)"] = "Humidity [%RH]"
         type_dict["Humidity (SHT31)"] = "Humidity"
     else:
         raise NotImplementedError(place)
@@ -104,8 +123,8 @@ def main(args):
         st.write('## {}の時間変化'.format(selected_type))
 
         selected_labels = []
-        for label, type in type_dict.items():
-            if type == selected_type:
+        for label, sensor_type in type_dict.items():
+            if sensor_type == selected_type:
                 selected_labels.append(label)
 
         columns = [column_dict[label] for label in selected_labels]
@@ -140,15 +159,22 @@ def main(args):
             formatter = mdates.DateFormatter("%H:%M")
         else:
             raise NotImplementedError()
+
         select_data = select_data[past: now]
         select_data = select_data.resample(rule).mean()
-        date_time = select_data.index
+        # date_time = select_data.index
 
         if graph == "streamlit":
             st.line_chart(select_data)
         elif graph == "pyplot":
             fig, ax = plt.subplots()
-            ax.plot(date_time, select_data, marker=".", label=selected_labels)
+            # ax.plot(date_time, select_data, marker=".", label=selected_labels)
+            markers = ['.', '*', 's', '^', 'v', '>', '<', 'D', 'x', '+', 'o']
+            for i, label in enumerate(selected_labels):
+                column = column_dict[label]
+                data = select_data[column].dropna()
+                marker = markers[i % len(markers)]
+                ax.plot(data.index, data.values, marker=marker, label=label)
 
             ax.set_title(selected_type)
             ax.set_xlabel("date time")

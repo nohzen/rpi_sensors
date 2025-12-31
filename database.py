@@ -77,13 +77,13 @@ if __name__ == '__main__':
     # db.convert_csv_to_db(csv_path)
 
     ### Add columns for SwitchBot sensors
-    db.add_column('switchbot_meter_temperature', 'REAL')
-    db.add_column('switchbot_meter_humidity', 'REAL')
-    db.add_column('switchbot_outdoor_meter_temperature', 'REAL')
-    db.add_column('switchbot_outdoor_meter_humidity', 'REAL')
-    db.add_column('switchbot_hub3_temperature', 'REAL')
-    db.add_column('switchbot_hub3_humidity', 'REAL')
-    db.show_db_info()
+    # db.add_column('switchbot_meter_temperature', 'REAL')
+    # db.add_column('switchbot_meter_humidity', 'REAL')
+    # db.add_column('switchbot_outdoor_meter_temperature', 'REAL')
+    # db.add_column('switchbot_outdoor_meter_humidity', 'REAL')
+    # db.add_column('switchbot_hub3_temperature', 'REAL')
+    # db.add_column('switchbot_hub3_humidity', 'REAL')
+    # db.show_db_info()
 
 
     # data_dict = {
