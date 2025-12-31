@@ -12,6 +12,31 @@ if sys.version_info < REQUIRED:
     )
 
 
+def plot_monthly_data_count(df):
+    import matplotlib.pyplot as plt
+
+    df['Date'] = pd.to_datetime(df['Date'])
+    monthly_counts = df.resample('ME', on='Date').size()
+    counts_per_hour = monthly_counts / 30.0 / 24.0
+
+    fig, ax = plt.subplots()
+    ax.plot(
+        counts_per_hour.index,
+        counts_per_hour.values,
+        marker='o',
+        linestyle='-'
+    )
+
+    ax.set_xlabel('Month')
+    ax.set_ylabel('Number of data points per hour')
+    ax.set_title('Monthly data count')
+    ax.grid(True)
+
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+
 class SensorDataDB:
     def __init__(self, db_path='datas/data_home.db'):
         self.db_path = db_path
@@ -28,6 +53,30 @@ class SensorDataDB:
         print(df.head())
         df.to_sql('sensor_data', self.conn, if_exists='replace', index=False)
         # if_exists='fail', 'replace', 'append'
+
+    def convert_switchbot_csv_to_db(self, csv_path='datas/switchbot_data.csv'):
+        df = pd.read_csv(csv_path)
+        print(df.head())
+
+        # plot_monthly_data_count(df)
+
+        temperature_name = "switchbot_hub3_temperature"
+        humidity_name = "switchbot_hub3_humidity"
+        df = df.drop(columns=[
+            "DPT(℃)",
+            "VPD(kPa)",
+            "Abs Humidity(g/m³)",
+            "Light_Value"
+        ], errors="raise")
+        df = df.rename(columns={
+            "Date": "datetime",
+            "Temperature_Celsius(℃)": temperature_name,
+            "Relative_Humidity(%)": humidity_name,
+        })
+        df["datetime"] = pd.to_datetime(df["datetime"], errors="raise")
+        # print(df.head())
+
+        df.to_sql('sensor_data', self.conn, if_exists='append', index=False)
 
     def show_db_info(self):
         # Table list
@@ -47,6 +96,16 @@ class SensorDataDB:
         # Data count
         self.cursor.execute("SELECT COUNT(*) FROM sensor_data")
         print("Total count:", self.cursor.fetchone()[0])
+
+        # Show some data
+        self.cursor.execute("""
+            SELECT *
+            FROM sensor_data
+            ORDER BY RANDOM()
+            LIMIT 5
+        """)
+        for row in self.cursor.fetchall():
+            print(row)
 
         # select_sql = 'SELECT * FROM sensor_data'
         # for row in self.cursor.execute(select_sql):
@@ -74,7 +133,10 @@ if __name__ == '__main__':
 
     db = SensorDataDB(db_path)
     db.show_db_info()
-    # db.convert_csv_to_db(csv_path)
+
+    ### Add switchbot datas from csv ###
+    # db.convert_switchbot_csv_to_db(csv_path="datas/hub3_data.csv")
+    # db.show_db_info()
 
     ### Add columns for SwitchBot sensors
     # db.add_column('switchbot_meter_temperature', 'REAL')
@@ -85,14 +147,4 @@ if __name__ == '__main__':
     # db.add_column('switchbot_hub3_humidity', 'REAL')
     # db.show_db_info()
 
-
-    # data_dict = {
-    #     'datetime': '2024-06-01 12:00:00',
-    #     'switchbot_meter_temperature': 23.5,
-    #     'switchbot_meter_humidity': 45.2,
-    #     'switchbot_hub3_temperature': 18.3,
-    #     'switchbot_hub3_humidity': 55.1
-    # }
-    # db.add_data(data_dict)
-    # db.show_db_info()
 

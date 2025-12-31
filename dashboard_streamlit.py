@@ -116,7 +116,7 @@ def main(args):
     # st.line_chart(df[column_dict[label]])
 
     ### Draw Graph ###
-    df.index = pd.to_datetime(df.index)
+    df.index = pd.to_datetime(df.index, format="mixed")
     # date_time = df.index
 
     for selected_type in selected_types:
